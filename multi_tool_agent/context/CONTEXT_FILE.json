@@ -1,0 +1,13 @@
+{
+  "user_id": "user_001",
+  "quota_kwh": 250,
+  "devices": ["smart_meter", "solar_inverter"],
+  "last_report": "You saved ₹320 and 3.1 kg CO₂ last week by shifting your AC usage to off-peak hours.",
+  "preferences": {
+    "auto_adjust_thermostat": true,
+    "receive_flex_signals": true
+  },
+  "location": "Mumbai",
+  "billing_cycle_start": "2025-05-01",
+  "billing_cycle_end": "2025-05-31"
+}
