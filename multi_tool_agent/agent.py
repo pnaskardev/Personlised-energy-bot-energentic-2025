@@ -4,6 +4,10 @@ import requests
 
 from multi_tool_agent.beckn_tools.confirm.beckn_confirm import BecknConfirm
 from multi_tool_agent.beckn_tools.search.beckn_search import SearchBecknInput
+
+from multi_tool_agent.world_engine_tools.meter.analyse_meter_data import AnaylyseMeterUse
+from multi_tool_agent.world_engine_tools.meter.meter_history import MeterHistory
+
 from multi_tool_agent.context.set_context import setAgentContext
 
 # -------------------------------
@@ -28,18 +32,6 @@ def get_monthly_quota() -> dict:
 get_quota_tool = FunctionTool(
     func=get_monthly_quota
 )
-# -------------------------------
-# Tool 2: Fetch Real-World Grid Events (World Engine)
-# -------------------------------
-
-def get_grid_load() -> dict:
-    try:
-        response = requests.get("https://world-engine.api.com/grid-load")
-        response.raise_for_status()
-        return {"status": "success", "data": response.json()}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-grid_event_tool = FunctionTool(func=get_grid_load)
 
 def generate_weekly_report(llm_agent=None) -> dict:
     try:
@@ -87,35 +79,13 @@ def generate_weekly_report(llm_agent=None) -> dict:
         return {"status": "error", "message": str(e)}
 weekly_report_tool = FunctionTool(func=lambda: generate_weekly_report(llm_agent=root_agent))
 
+get_meter_data_tool = FunctionTool(
+    func = AnaylyseMeterUse.analyze_meter_data,
+)
 
-def get_grid_load() -> dict:
-    try:
-        response = requests.get("https://world-engine.api.com/grid-load")
-        response.raise_for_status()
-        return {"status": "success", "data": response.json()}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-grid_event_tool = FunctionTool(func=get_grid_load)
-
-
-def get_substations() -> dict:
-    try:
-        response = requests.get("https://world-engine.api.com/utilities/substations")
-        response.raise_for_status()
-        return {"status": "success", "substations": response.json()}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-get_substations_tool = FunctionTool(func=get_substations)
-
-def get_transformers() -> dict:
-    try:
-        response = requests.get("https://world-engine.api.com/utilities/transformers")
-        response.raise_for_status()
-        return {"status": "success", "transformers": response.json()}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-get_transformers_tool = FunctionTool(func=get_transformers)
-
+analyze_meter_data_tool = FunctionTool(
+    func=MeterHistory.get_meter_history,
+)
 
 confirm_program_tool = FunctionTool(
     func=BecknConfirm.confirm_program,
@@ -136,6 +106,10 @@ root_agent = LlmAgent(
     After performing a Beckn search, always ask the user which program they would like to confirm.
     If they give a name or ID, use the confirmation tool.
     Prompt for user info if not already provided.
+
+    The usermay also ask for meter history and analysis its your job to get the meter data and analyze it.
+    If the user asks for a weekly report, use the generate_weekly_report tool.
+    If the user asks for a monthly quota, use the set_quota_tool to set it.
     """,
 
     global_instruction="""
@@ -143,17 +117,19 @@ root_agent = LlmAgent(
     First, use the Beckn search tool to list available programs.
     Then ask the user which one to choose. Once selected, confirm the program using the confirmation tool.
     Make the conversation feel natural by asking questions to fill any missing fields.
+
+    The usermay also ask for meter history and analysis its your job to get the meter data and analyze it.
+    If the user asks for a weekly report, use the generate_weekly_report tool.
+    If the user asks for a monthly quota, use the set_quota_tool to set it.
     """,
     # context=context_data,
     tools=[
         # set_quota_tool,
         # get_quota_tool,
-        # grid_event_tool,
-        # get_substations_tool,
-        # get_transformers_tool,
-     
-        # weekly_report_tool,
+
         search_beckn_tool,
         confirm_program_tool,
+        get_meter_data_tool,
+        analyze_meter_data_tool
     ],
 )
