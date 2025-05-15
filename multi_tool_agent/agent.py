@@ -5,6 +5,7 @@ import requests
 from multi_tool_agent.beckn_tools.confirm.beckn_confirm import BecknConfirm
 from multi_tool_agent.beckn_tools.search.beckn_search import SearchBecknInput
 
+from world_engine_tools.grid.grid import GridUtilities
 from world_engine_tools.meter.meter import Meter
 
 from multi_tool_agent.context.set_context import setAgentContext
@@ -99,6 +100,17 @@ search_beckn_tool = FunctionTool(
     func=SearchBecknInput.search_beckn,
 )
     
+get_grid_load_tool = FunctionTool(
+    func=GridUtilities.grid_load,
+)
+
+analyse_grid_load_tool = FunctionTool(
+    func=GridUtilities.analyze_grid_load,
+)
+
+add_distrbuted_energy_resource_tool = FunctionTool(
+    func=GridUtilities.load_utilities,
+)
 
 
 root_agent = LlmAgent(
@@ -135,6 +147,9 @@ root_agent = LlmAgent(
         confirm_program_tool,
         get_meter_data_tool,
         analyze_meter_data_tool,
-        get_current_meter_status_tool
+        get_current_meter_status_tool,
+        get_grid_load_tool,
+        analyse_grid_load_tool,
+        add_distrbuted_energy_resource_tool
     ],
 )
