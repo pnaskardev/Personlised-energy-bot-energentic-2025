@@ -5,10 +5,10 @@ import requests
 from multi_tool_agent.beckn_tools.confirm.beckn_confirm import BecknConfirm
 from multi_tool_agent.beckn_tools.search.beckn_search import SearchBecknInput
 
-from multi_tool_agent.world_engine_tools.meter.analyse_meter_data import AnaylyseMeterUse
-from multi_tool_agent.world_engine_tools.meter.meter_history import MeterHistory
 
 from multi_tool_agent.context.set_context import setAgentContext
+from world_engine_tools.meter.analyse_meter_data import AnaylyseMeterUse
+from world_engine_tools.meter.meter_history import MeterHistory
 
 # -------------------------------
 # Tool 1: Set Monthly Energy Quota
