@@ -5,10 +5,10 @@ import requests
 from multi_tool_agent.beckn_tools.confirm.beckn_confirm import BecknConfirm
 from multi_tool_agent.beckn_tools.search.beckn_search import SearchBecknInput
 
+from world_engine_tools.meter.meter import Meter
 
 from multi_tool_agent.context.set_context import setAgentContext
-from world_engine_tools.meter.analyse_meter_data import AnaylyseMeterUse
-from world_engine_tools.meter.meter_history import MeterHistory
+
 
 # -------------------------------
 # Tool 1: Set Monthly Energy Quota
@@ -80,11 +80,15 @@ def generate_weekly_report(llm_agent=None) -> dict:
 weekly_report_tool = FunctionTool(func=lambda: generate_weekly_report(llm_agent=root_agent))
 
 get_meter_data_tool = FunctionTool(
-    func = AnaylyseMeterUse.analyze_meter_data,
+    func = Meter.get_meter_history,
 )
 
 analyze_meter_data_tool = FunctionTool(
-    func=MeterHistory.get_meter_history,
+    func=Meter.analyze_meter_data,
+)
+
+get_current_meter_status_tool = FunctionTool(
+    func=Meter.get_meter_status,
 )
 
 confirm_program_tool = FunctionTool(
@@ -124,12 +128,13 @@ root_agent = LlmAgent(
     """,
     # context=context_data,
     tools=[
-        # set_quota_tool,
-        # get_quota_tool,
+        set_quota_tool,
+        get_quota_tool,
 
         search_beckn_tool,
         confirm_program_tool,
         get_meter_data_tool,
-        analyze_meter_data_tool
+        analyze_meter_data_tool,
+        get_current_meter_status_tool
     ],
 )
